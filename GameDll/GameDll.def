@@ -1,0 +1,8 @@
+; GameDll.def : 声明 DLL 的模块参数。
+
+LIBRARY "GameDll"
+
+EXPORTS
+    ; 此处可以是显式导出
+	StartHook
+	UnHook
