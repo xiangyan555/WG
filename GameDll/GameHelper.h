@@ -12,6 +12,9 @@ public:
 	BOOL GetGoodsInfoByName(CString strGoodsName, GoodsPacket &goodsPacket);
 	void TraverseMonster(CDWordArray &monsterNodes);
 	void TraverseMonster(CDWordArray &monsterNodes, DWORD dwBase);
+	DWORD SelectNearMonster(CDWordArray &monsterNodes, ROLE &role);	//选择离人物最近的怪物
+	void SelectedMonster(DWORD dwID);	//选中怪物
+	void UseSkill(DWORD dwSkillID, DWORD dwMonsterID);	//使用技能
 	//void GetRoleInfo(Role &role);
 	//void DoAction(DWORD actionID);
 	//void TraverseEnemy(CList<Enemy, Enemy&> &enemyList);

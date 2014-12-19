@@ -2,6 +2,7 @@
 #include "GameHelper.h"
 #include "StructDef.h"
 #include "ConstantDef.h"
+#include "CommonFun.h"
 
 extern DWORD GameBaseAddr;			//游戏基址（角色，怪物共用）
 extern DWORD PackageBaseAddr;		//背包首地址
@@ -9,6 +10,9 @@ extern DWORD UseGoodsPacketInitCall;	//初始化使用物品封包CALL
 extern DWORD UseGoodsCallParam;		//使用物品CALL的参数
 extern DWORD UseGoodsCall;				//使用物品CALL	
 extern DWORD JudgeCallAddr;			//判断对象是怪物、NPC、宠物CALL
+extern DWORD SelectMonsterCallAddr;	//选怪CALL基址
+extern DWORD UseSkillCall;			//使用技能CALL
+
 GameHelper::GameHelper(void)
 {
 	srand( (unsigned)time( NULL ) );
@@ -132,38 +136,127 @@ void GameHelper::TraverseMonster(CDWordArray &monsterNodes, DWORD dwBase)
 	DWORD dwParam = 0;
 	DWORD dwMonsterObj;
 	DWORD dwRet;
-	byFlag = *(BYTE *)(dwBase + ENV_TREE_FLAG_OFFSET);
-	if (byFlag == 0)
+	try
 	{
-		MonsterInfo monster(dwBase);
-		if (monster.dwType == TYPE_MONSTER)
+		byFlag = *(BYTE *)(dwBase + ENV_TREE_FLAG_OFFSET);
+		if (byFlag == 0)
 		{
-			dwRole = *(DWORD *)GameBaseAddr;
-			dwRole = *(DWORD *)(dwRole + ROLE_OFFSET_1);
-
-			dwMonsterObj = * (DWORD *)(dwBase + MONSTER_OBJECT_OFFSET);
-			__asm
+			MonsterInfo monster(dwBase);
+			if (monster.dwType == TYPE_MONSTER)
 			{
-				pushad;
-				mov ecx,JudgeCallAddr;
-				mov ecx,[ecx];
-				push dwParam;
-				push dwMonsterObj;
-				mov eax,[ecx];
-				push dwRole;
-				call [eax+0xFC];
-				mov dwRet,eax;
-				popad;
+				dwRole = *(DWORD *)GameBaseAddr;
+				dwRole = *(DWORD *)(dwRole + ROLE_OFFSET_1);
+
+				dwMonsterObj = * (DWORD *)(dwBase + MONSTER_OBJECT_OFFSET);
+				__asm
+				{
+					pushad;
+					mov ecx,JudgeCallAddr;
+					mov ecx,[ecx];
+					push dwParam;
+					push dwMonsterObj;
+					mov eax,[ecx];
+					push dwRole;
+					call [eax+0xFC];
+					mov dwRet,eax;
+					popad;
+				}
+				if (dwRet == 0)
+				{
+					monsterNodes.Add(dwBase);
+				}
 			}
 
-			if (dwRet == 0)
-			{
-				TRACE("名字:%s--ID:%08X--X:%f--Y:%f\n", monster.pName, monster.dwID, monster.x, monster.y);
-				monsterNodes.Add(dwBase);
-			}
+			DWORD dwNext;
+			dwNext = *(DWORD *)dwBase;
+			TraverseMonster(monsterNodes, dwNext);
+
+			dwNext = *(DWORD *)(dwBase + ENV_TREE_RIGHT_OFFSET);
+			TraverseMonster(monsterNodes, dwNext);
 		}
 	}
+	catch (...)
+	{
+		TRACE("遍历怪物时出错\n");
+	}
 
+}
+
+//选择最近的怪物
+DWORD GameHelper::SelectNearMonster(CDWordArray &monsterNodes, ROLE &role)
+{
+		DWORD dwRet = 0xFFFFFFFF;
+		float dwMinMeter = 20;	//最小的距离
+		for (int i = 0; i < monsterNodes.GetCount(); i++)
+		{
+			MonsterInfo monster(monsterNodes.GetAt(i));
+			float dwTmp = CalculateDistance(monster.x, monster.y, role.x, role.y);
+			if (dwTmp < dwMinMeter)
+			{
+				dwMinMeter = dwTmp;
+				dwRet = monsterNodes.GetAt(i);
+			}
+		}
+
+		TRACE("结果：%08X\n", dwRet);
+		return dwRet;
+	
+}
+
+//选中怪物
+void GameHelper::SelectedMonster(DWORD dwID)
+{
+	__try
+	{
+		__asm
+		{
+			pushad;
+			mov ecx, SelectMonsterCallAddr;
+			mov ecx,[ecx];
+			mov eax,dwID;
+			mov edx,[ecx];
+			push 1;
+			push eax;
+			call [edx+0x3C];
+			popad;
+		}
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER)
+	{
+		TRACE("选中怪物CALL出错\n");
+	}
+
+}
+
+//使用技能
+void GameHelper::UseSkill(DWORD dwSkillID, DWORD dwMonsterID)
+{
+	__try
+	{
+		DWORD dwObj = * (DWORD *)GameBaseAddr;
+		dwObj = * (DWORD *)(dwObj + ROLE_OFFSET_1);
+		dwObj = * (DWORD *)(dwObj + 0x200);	//5816DD18
+		TRACE("Obj=%08X\n", dwObj);
+		__asm
+		{
+			pushad;
+			push 0xBF800000;
+			push 0xBF800000;
+			push 0xBF800000;
+			push dwMonsterID;
+			push 0xFFFFFFFF;
+			push dwSkillID;
+			mov edi, dwObj;
+			mov ecx, edi;
+			mov eax, UseSkillCall;
+			call eax;
+			popad;
+		}
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER)
+	{
+		TRACE("使用技能CALL出错\n");
+	}
 }
 
 //void GameHelper::DoAction(DWORD actionID)  {

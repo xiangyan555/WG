@@ -7,6 +7,7 @@
 #include "afxdialogex.h"
 #include "GameHelper.h"
 #include "StructDef.h"
+#include "CommonFun.h"
 
 
 // CTestDlg 对话框
@@ -388,5 +389,17 @@ void CTestDlg::OnBnClickedButton6()
 	// TODO: 在此添加控件通知处理程序代码
 	GameHelper helper;
 	CDWordArray baseArray;
+	baseArray.RemoveAll();
 	helper.TraverseMonster(baseArray);
+	ROLE role;
+
+	DWORD dwNode = helper.SelectNearMonster(baseArray, role);
+	if (dwNode != 0xFFFFFFFF)
+	{
+		MonsterInfo monster(dwNode);
+		TRACE("名字：%s---ID:%08X--X:%f---Y:%f\n", monster.pName, monster.dwID, monster.x, monster.y);
+		helper.SelectedMonster(monster.dwID);
+		//helper.UseSkill(0, monster.dwID);
+	}
+	
 }

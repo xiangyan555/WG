@@ -3,11 +3,11 @@
 #include <math.h>
 
 //根据勾股定理，计算两点之间的距离
-DWORD CalculateDistance(float x1, float y1, float x2, float y2) {
+float CalculateDistance(float x1, float y1, float x2, float y2) {
 	float x3 = x1 - x2;
 	float y3 = y1 - y2;
 	float result = sqrt(pow(x3,2) + pow(y3, 2));
-	return (DWORD) result;
+	return result;
 }
 
 

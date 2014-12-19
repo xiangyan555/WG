@@ -87,12 +87,11 @@ GoodsInfo::GoodsInfo(DWORD dwGoodsObj)
 
 MonsterInfo::MonsterInfo(DWORD dwBase)
 {
-	DWORD	dwTmp;
-	DWORD	dwTmp2;
+	DWORD	dwTmp = 0;
+	DWORD	dwTmp2 = 0;
 	__try
 	{
-		dwTmp = *(DWORD *)dwBase;
-		dwTmp = *(DWORD *)(dwTmp + MONSTER_OBJECT_OFFSET);
+		dwTmp = *(DWORD *)(dwBase + MONSTER_OBJECT_OFFSET);
 		dwTmp2 = dwTmp;
 		dwTmp = *(DWORD *)(dwTmp + MONSTER_TYPE_OFFSET_1);
 		dwType = *(DWORD *)(dwTmp + MONSTER_TYPE_OFFSET_2);
@@ -102,7 +101,7 @@ MonsterInfo::MonsterInfo(DWORD dwBase)
 			x = *(float *)(dwTmp2 + MONSTER_POS_X_OFFSET);
 			y = *(float *)(dwTmp2 + MONSTER_POS_Y_OFFSET);
 			dwID = *(DWORD *)(dwTmp2 + MONSTER_ID_OFFSET);
-			
+
 			dwTmp2 = *(DWORD *)(dwTmp2 + MONSTER_ATTR_OFFSET_1);
 			dwTmp2 = *(DWORD *)(dwTmp2 + MONSTER_ATTR_OFFSET_2);
 			pName = (char *)(dwTmp2 + MONSTER_NAME_OFFSET);
@@ -112,6 +111,6 @@ MonsterInfo::MonsterInfo(DWORD dwBase)
 	}
 	__except (EXCEPTION_EXECUTE_HANDLER)
 	{
-		TRACE("构造怪物对象时出错\n");
+		TRACE("构造怪物对象时出错,出错对象：%08X\n",dwBase);
 	}
 }

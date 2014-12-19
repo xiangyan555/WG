@@ -51,7 +51,7 @@
 
 #define MONSTER_OFFSET					0x64		//怪物偏移
 #define MONSTER_OBJECT_OFFSET			0x10		//对象偏移
-#define MONSTER_ATTR_OFFSET_1			0x1E8		//属性一级偏移
+#define MONSTER_ATTR_OFFSET_1			0x1EC		//属性一级偏移
 #define MONSTER_ATTR_OFFSET_2			0x4			//属性二级偏移
 #define MONSTER_BLOOD_OFFSET			0x8			//血值偏移
 #define MONSTER_NAME_OFFSET				0x34		//名字偏移

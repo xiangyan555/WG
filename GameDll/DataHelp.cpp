@@ -133,12 +133,16 @@ void DataHelp::UpdateGameData() {
 		UseGoodsCallParam = ScanAddress("8995A4FEFFFF8985A8FEFFFFE8",0, 0);
 		UseGoodsCall = ScanCall("8995A4FEFFFF8985A8FEFFFFE8", 0, 1);
 		JudgeCallAddr = ScanAddress("8D55B45256C745B4000000008B01", 0, 0);
-		TRACE("角色基址：%X\n",GameBaseAddr);
-		TRACE("背包基址：%X\n",PackageBaseAddr);
-		TRACE("使用物品封包数据初始化CALL：%X\n",UseGoodsPacketInitCall);
-		TRACE("使用物品CALL参数：%X\n",UseGoodsCallParam);
-		TRACE("使用物品CALL：%X\n",UseGoodsCall);
-		TRACE("判断对象小类Call基址：%X\n",JudgeCallAddr);
+		SelectMonsterCallAddr = ScanAddress("8B46088B116A0150FF523C8B87D8000000", 0, 0);
+		UseSkillCall = ScanCall("528B55C4525156508BCFE8", 0, 1);
+		TRACE("角色基址：%08X\n",GameBaseAddr);
+		TRACE("背包基址：%08X\n",PackageBaseAddr);
+		TRACE("使用物品封包数据初始化CALL：%08X\n",UseGoodsPacketInitCall);
+		TRACE("使用物品CALL参数：%08X\n",UseGoodsCallParam);
+		TRACE("使用物品CALL：%08X\n",UseGoodsCall);
+		TRACE("判断对象小类Call基址：%08X\n",JudgeCallAddr);
+		TRACE("选怪CALL基址：%08X", SelectMonsterCallAddr);
+		TRACE("使用技能CALL：%08X", UseSkillCall);
 	}
 	catch (std::exception ex)
 	{

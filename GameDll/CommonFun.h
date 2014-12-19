@@ -1,7 +1,7 @@
 #pragma once
 
 //根据勾股定理，计算两点之间的距离
-DWORD CalculateDistance(float x1, float y1, float x2, float y2);
+float CalculateDistance(float x1, float y1, float x2, float y2);
 
 //当前应用程序运行的目录
 DWORD GetCurrentFolder(DWORD nBufferLength, LPTSTR lpBuffer);
